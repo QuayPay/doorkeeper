@@ -3,35 +3,45 @@ require 'spec_helper_integration'
 module Doorkeeper::OAuth
   describe PasswordAccessTokenRequest do
     let(:server) { double :server, :default_scopes => Doorkeeper::OAuth::Scopes.new, :access_token_expires_in => 2.hours, :refresh_token_enabled? => false }
+    let(:credentials) { Client::Credentials.new(client.uid, client.secret) }
     let(:client) { FactoryGirl.create(:application) }
     let(:owner)  { double :owner, :id => 99 }
 
     subject do
-      PasswordAccessTokenRequest.new(server, client, owner)
+      PasswordAccessTokenRequest.new(server, credentials, owner)
     end
 
     it 'issues a new token for the client' do
-      expect do
+      expect {
         subject.authorize
-      end.to change { client.access_tokens.count }.by(1)
+      }.to change { client.access_tokens.count }.by(1)
     end
 
     it 'issues a new token without a client' do
-      expect do
-        subject.client = nil
+      expect {
+        subject.credentials = nil
         subject.authorize
-      end.to change { Doorkeeper::AccessToken.count }.by(1)
+      }.to change { Doorkeeper::AccessToken.count }.by(1)
     end
 
-    it "requires the owner" do
+    it 'does not issue a new token with an invalid client' do
+      expect {
+        subject.client = nil
+        subject.authorize
+      }.to_not change { Doorkeeper::AccessToken.count }
+
+      expect(subject.error).to eq(:invalid_client)
+    end
+
+    it 'requires the owner' do
       subject.resource_owner = nil
       subject.validate
-      subject.error.should == :invalid_resource_owner
+      expect(subject.error).to eq(:invalid_resource_owner)
     end
 
     it 'optionally accepts the client' do
-      subject.client = nil
-      subject.should be_valid
+      subject.credentials = nil
+      expect(subject).to be_valid
     end
 
     describe "with scopes" do
@@ -40,17 +50,17 @@ module Doorkeeper::OAuth
       end
 
       it 'validates the current scope' do
-        server.stub :scopes => Doorkeeper::OAuth::Scopes.from_string('another')
+        allow(server).to receive(:scopes).and_return(Doorkeeper::OAuth::Scopes.from_string('another'))
         subject.validate
-        subject.error.should == :invalid_scope
+        expect(subject.error).to eq(:invalid_scope)
       end
 
       it 'creates the token with scopes' do
-        server.stub :scopes => Doorkeeper::OAuth::Scopes.from_string("public")
+        allow(server).to receive(:scopes).and_return(Doorkeeper::OAuth::Scopes.from_string("public"))
         expect {
           subject.authorize
         }.to change { Doorkeeper::AccessToken.count }.by(1)
-        Doorkeeper::AccessToken.last.scopes.should include(:public)
+        expect(Doorkeeper::AccessToken.last.scopes).to include('public')
       end
     end
   end

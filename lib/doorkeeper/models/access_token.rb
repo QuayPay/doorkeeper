@@ -28,9 +28,12 @@ module Doorkeeper
     #   where(:refresh_token => refresh_token).first
     # end
 
-    # def self.revoke_all_for(application_id, resource_owner)
-    #   delete_all_for(application_id, resource_owner)
-    # end
+    #def self.revoke_all_for(application_id, resource_owner)
+    #  where(:application_id => application_id,
+    #        :resource_owner_id => resource_owner.id,
+    #        :revoked_at => nil)
+    #  .map(&:revoke)
+    #end
 
     # def self.matching_token_for(application, resource_owner_or_id, scopes)
     #   resource_owner_id = resource_owner_or_id.respond_to?(:to_key) ? resource_owner_or_id.id : resource_owner_or_id
