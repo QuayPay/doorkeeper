@@ -1,7 +1,7 @@
 module Doorkeeper
   class AccessToken < ::Couchbase::Model
     
-    attribute :resource_owner_id, :token, :expires_at, :scopes
+    attribute :resource_owner_id, :token, :expires_in, :scopes
     attribute :created_at, :default => lambda { Time.now.to_i + 1 } # this does not need to be sub-second accurate
     view :by_resource_owner_id, :by_token, :by_refresh_token, :by_application_id_and_resource_owner_id
 
@@ -12,7 +12,7 @@ module Doorkeeper
     before_create :generate_refresh_token, :if => :use_refresh_token?
 
     def expires_in
-      30
+      300
     end
 
     def accessible?
