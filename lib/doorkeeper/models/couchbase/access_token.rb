@@ -1,5 +1,6 @@
 module Doorkeeper
   class AccessToken < ::Couchbase::Model
+    design_document :dk_at  # Short for Doorkeeper_AccessToken
     
     attribute :resource_owner_id, :token, :expires_in, :scopes
     attribute :created_at, :default => lambda { Time.now.to_i + 1 } # this does not need to be sub-second accurate
