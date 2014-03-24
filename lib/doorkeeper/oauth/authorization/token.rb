@@ -17,7 +17,6 @@ module Doorkeeper
             :expires_in        => configuration.access_token_expires_in,
             :use_refresh_token => false
           })
-          Doorkeeper::AccessToken.bucket.touch @token.id, :ttl => configuration.access_token_expires_in
         end
 
         def configuration

@@ -42,7 +42,6 @@ module Doorkeeper
           :expires_in        => server.access_token_expires_in,
           :use_refresh_token => server.refresh_token_enabled?
         })
-        Doorkeeper::AccessToken.bucket.touch @access_token.id, :ttl => 1800
       end
 
       def validate_attributes

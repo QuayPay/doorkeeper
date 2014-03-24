@@ -10,6 +10,7 @@ module Doorkeeper
 
     before_create :generate_token
     before_create :generate_refresh_token, :if => :use_refresh_token?
+    after_create :set_ttl
 
     def expires_in
       300
@@ -74,6 +75,10 @@ module Doorkeeper
     private_class_method :delete_all_for 
 
     private
+
+    def set_ttl 
+      Doorkeeper::AccessToken.bucket.touch self.id, :ttl => self.expires_in
+    end
 
     def generate_refresh_token
       if use_refresh_token
