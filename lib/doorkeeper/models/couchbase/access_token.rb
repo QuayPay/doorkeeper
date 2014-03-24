@@ -75,7 +75,9 @@ module Doorkeeper
     end
     private_class_method :delete_all_for 
 
+
     private
+
 
     def set_ttl 
       Doorkeeper::AccessToken.bucket.touch self.id, :ttl => self.expires_in

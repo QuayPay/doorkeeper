@@ -1,5 +1,6 @@
 module Doorkeeper
   class Application < ::Couchbase::Model
+    design_document :dk_app
 
     attribute   :name, :secret, :redirect_uri
     attribute :created_at, :default => lambda { Time.now.utc }
