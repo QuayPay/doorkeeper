@@ -3,7 +3,7 @@ module Doorkeeper
     design_document :dk_app
 
     attribute   :name, :secret, :redirect_uri
-    attribute :created_at, :default => lambda { Time.now.utc }
+    attribute :created_at, :default => lambda { Time.now.to_i }
     alias_attribute :uid, :id
 
     before_create :generate_uid, :generate_secret
