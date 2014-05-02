@@ -7,7 +7,7 @@ module Doorkeeper
     alias_attribute :uid, :id
 
     before_create :generate_uid, :generate_secret
-    view :by_uid_and_secret, :show_all
+    view :by_uid_and_secret, :show_all, :by_user_id
 
     def self.authorized_for(resource_owner)
       AccessToken.where_owner_id(resource_owner.id)
@@ -21,6 +21,10 @@ module Doorkeeper
       find_by_id(uid)
     end
 
+    def self.by_user(id)
+      by_user_id({:key => [id], :stale => false})
+    end
+    
     def self.all
       show_all({:key => nil, :include_docs => true, :stale => false})
     end
