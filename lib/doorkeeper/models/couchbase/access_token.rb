@@ -2,7 +2,7 @@ module Doorkeeper
   class AccessToken < ::Couchbase::Model
     design_document :dk_at  # Short for Doorkeeper_AccessToken
     
-    attribute :resource_owner_id, :token, :expires_in, :scopes
+    attribute :resource_owner_id, :token, :expires_in, :scopes, :refresh_token
     attribute :created_at, :default => lambda { Time.now.to_i + 1 } # this does not need to be sub-second accurate
     view :by_resource_owner_id, :by_token, :by_refresh_token, :by_application_id_and_resource_owner_id
 
@@ -79,7 +79,7 @@ module Doorkeeper
     private
 
 
-    def set_ttl 
+    def set_ttl
       Doorkeeper::AccessToken.bucket.touch self.id, :ttl => self.expires_in
     end
 
