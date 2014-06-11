@@ -13,9 +13,6 @@ module Doorkeeper
     before_create :generate_refresh_token, :if => :use_refresh_token?
     after_create :set_ttl
 
-    def expires_in
-      300
-    end
 
     def accessible?
       true if self.created_at + self.expires_in > Time.now.to_i
